@@ -122,7 +122,7 @@ uint8_t MSPClass::available() {
 	return cntComData;
 }
 
-MSPClass::CommandData MSPClass::retriveCMD() {
+MSPClass::CommandData MSPClass::retrieveCMD() {
 	if (cntComData) {
 		return comData[--cntComData];
 	} else {

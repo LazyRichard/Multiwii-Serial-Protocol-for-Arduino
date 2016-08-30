@@ -49,7 +49,7 @@ public:
 	
 	uint8_t available();
 	
-	CommandData retriveCMD();
+	CommandData retrieveCMD();
 	
 protected:
 	enum class RECEIVE_STATUS : uint8_t {
