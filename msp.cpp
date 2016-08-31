@@ -5,7 +5,8 @@ MSPClass MSP;
 void MSPClass::begin(unsigned long baudrate, uint8_t rx, uint8_t tx) {
 	isHwSerial = false;
 	
-	swSerial = new SoftwareSerial(baudrate, rx, tx);
+	swSerial = new SoftwareSerial(rx, tx);
+	swSerial->begin(baudrate);
 }
 
 void MSPClass::beginSerial(unsigned long baudrate) {
@@ -64,7 +65,7 @@ void MSPClass::sendCMD(uint8_t cmd, size_t size, uint8_t *data) {
 	}
 	
 	// write checksum to buff
-	writeBuff[curser++] = calcChecksum(size, cmd, data);
+	writeBuff[curser++] = calcChecksum(cmd, size, data);
 	
 	// write command to serial
 	if (isHwSerial) {
@@ -76,7 +77,15 @@ void MSPClass::sendCMD(uint8_t cmd, size_t size, uint8_t *data) {
 	}
 }
 
-void MSPClass::receiveCMD(char ch) {
+void MSPClass::receiveCMD() {
+	char ch;
+	
+	if (isHwSerial) {
+		ch = hwSerial->read();
+	} else {
+		ch = swSerial->read();
+	}
+	
 	switch (receiveStatus) {
 	case (RECEIVE_STATUS::IDLE):
 		receiveStatus = (ch == '$') ? (RECEIVE_STATUS::HEADER_START) : (RECEIVE_STATUS::IDLE);
@@ -118,7 +127,15 @@ void MSPClass::receiveCMD(char ch) {
 	}
 }
 
-uint8_t MSPClass::available() {
+int MSPClass::available() {
+	if (isHwSerial) {
+		return (hwSerial->available());
+	} else {
+		return (swSerial->available());
+	}
+}
+
+uint8_t MSPClass::availableData() {
 	return cntComData;
 }
 
